@@ -59,4 +59,4 @@ def download(url: str, dest_folder: str):
     return os.path.abspath(file_path)
 
 
-app.run(port=8080)
+app.run(host='0.0.0.0', port=8080)
