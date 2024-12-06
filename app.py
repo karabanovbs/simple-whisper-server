@@ -5,6 +5,7 @@ import requests
 from urllib.parse import unquote
 import uuid
 
+from whisper import DecodingOptions
 
 modelTiny = whisper.load_model("tiny")
 modelTurbo = whisper.load_model("turbo")
@@ -14,6 +15,7 @@ app = Flask(__name__)
 @app.route("/transcribe")
 def transcribe():
     url = request.args.get('url', '')
+    lang = request.args.get('lang')
 
     url = unquote(url)
 
@@ -21,14 +23,22 @@ def transcribe():
 
     path = download(url, dest_folder='tmp')
 
-
     target_model = modelTurbo
     if model == 'tiny':
         target_model = modelTiny
     if model == 'turbo':
         target_model = modelTurbo
 
-    result = target_model.transcribe(path)
+    print(lang)
+
+    options = dict()
+
+    if lang is not None:
+        options["language"] = lang
+
+    transcribe_options = dict(task="transcribe", **options)
+
+    result = target_model.transcribe(path, **transcribe_options)
     os.remove(path)
 
     return result["text"]
